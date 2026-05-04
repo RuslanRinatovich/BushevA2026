@@ -1,8 +1,10 @@
 package com.furniture.service;
 
 import com.furniture.entity.Material;
+import com.furniture.repository.MaterialConsumptionRepository;
 import com.furniture.repository.MaterialRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -11,7 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class MaterialService {
-
+    private final MaterialConsumptionRepository materialConsumptionRepository;
     private final MaterialRepository materialRepository;
 
     public List<Material> findAll() {
@@ -38,7 +40,19 @@ public class MaterialService {
 
     @Transactional
     public void deleteById(Long id) {
-        materialRepository.deleteById(id);
+        Material material = findById(id);
+
+        // Проверка наличия связанных записей в material_consumption
+        if (materialConsumptionRepository.findByMaterialAndWrittenOffTrue(material).size() > 0) {
+            throw new RuntimeException("Невозможно удалить материал '" + material.getName() +
+                    "', так как он использовался в производственных заказах");
+        }
+
+        try {
+            materialRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("Невозможно удалить материал, так как он связан с другими записями");
+        }
     }
 
     @Transactional

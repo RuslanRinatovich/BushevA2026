@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FurnitureFactory | Производство</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+        }
+        .content-card {
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .btn-custom {
+            border-radius: 10px;
+            padding: 8px 16px;
+            transition: all 0.3s;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+        }
+        .badge-planned { background: #6c757d; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+        .badge-progress { background: #fd7e14; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+        .badge-completed { background: #28a745; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+        .badge-cancelled { background: #dc3545; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; }
+        .table th {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+        }
+        .search-box {
+            border-radius: 50px;
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+        }
+        .search-box:focus {
+            border-color: #f5576c;
+            box-shadow: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard">
+            <i class="bi bi-gear-wide-connected"></i> FurnitureFactory
+        </a>
+        <div class="d-flex gap-3">
+            <a href="/dashboard" class="text-light text-decoration-none">
+                <i class="bi bi-speedometer2"></i> Дашборд
+            </a>
+            <a href="/logout" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-right"></i> Выйти
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="content-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+            <div>
+                <h2 class="mb-0"><i class="bi bi-gear-wide-connected text-primary"></i> Производственные заказы</h2>
+                <p class="text-muted mb-0">Управление производством продукции</p>
+            </div>
+            <div>
+                <a href="/production/order/create" class="btn btn-primary btn-custom">
+                    <i class="bi bi-plus-circle"></i> Новый заказ
+                </a>
+            </div>
+        </div>
+
+        <!-- Сообщения -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <!-- Форма поиска и фильтрации -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-5">
+                <form method="get" action="/production/orders" class="d-flex gap-2">
+                    <input type="text" name="search" class="form-control search-box"
+                           placeholder="Поиск по номеру заказа или продукции..."
+                           th:value="${search}">
+                    <button type="submit" class="btn btn-primary btn-custom">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <a href="/production/orders" class="btn btn-secondary btn-custom">
+                        <i class="bi bi-arrow-repeat"></i> Сброс
+                    </a>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <form method="get" action="/production/orders" id="statusForm">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">Все статусы</option>
+                        <option value="planned" th:selected="${status == 'planned'}">Планируется</option>
+                        <option value="in_progress" th:selected="${status == 'in_progress'}">В работе</option>
+                        <option value="completed" th:selected="${status == 'completed'}">Завершён</option>
+                        <option value="cancelled" th:selected="${status == 'cancelled'}">Отменён</option>
+                    </select>
+                    <input type="hidden" name="search" th:value="${search}">
+                </form>
+            </div>
+        </div>
+        <!-- Таблица заказов -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>№ заказа</th>
+                    <th>Продукция</th>
+                    <th>План. количество</th>
+                    <th>Факт. количество</th>
+                    <th>Статус</th>
+                    <th>План. дата</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td><strong th:text="${order.orderNumber}">ПЗ-0001</strong></td>
+                    <td th:text="${order.product.name}">Стол</td>
+                    <td th:text="${#numbers.formatDecimal(order.plannedQuantity, 1, 2)}">10.00</td>
+                    <td th:text="${#numbers.formatDecimal(order.actualQuantity, 1, 2)}">0.00</td>
+                    <td>
+                        <span th:if="${order.status == 'planned'}" class="badge-planned"><i class="bi bi-calendar"></i> Планируется</span>
+                        <span th:if="${order.status == 'in_progress'}" class="badge-progress"><i class="bi bi-gear"></i> В работе</span>
+                        <span th:if="${order.status == 'completed'}" class="badge-completed"><i class="bi bi-check-circle"></i> Завершён</span>
+                        <span th:if="${order.status == 'cancelled'}" class="badge-cancelled"><i class="bi bi-x-circle"></i> Отменён</span>
+                    </td>
+                    <td th:text="${#temporals.format(order.plannedDate, 'dd.MM.yyyy')}">01.01.2025</td>
+                    <td>
+                        <form th:if="${order.status == 'planned'}" th:action="@{/production/order/start/{id}(id=${order.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-warning">Запустить</button>
+                        </form>
+                        <div th:if="${order.status == 'in_progress'}" style="display:inline;">
+                            <form th:action="@{/production/order/writeoff/{id}(id=${order.id})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-info">Списать</button>
+                            </form>
+                            <form th:action="@{/production/order/complete/{id}(id=${order.id})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-success">Завершить</button>
+                            </form>
+                        </div>
+                        <form th:if="${order.status == 'planned' or order.status == 'in_progress'}" th:action="@{/production/order/cancel/{id}(id=${order.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Отменить заказ?')">Отменить</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${orders.isEmpty()}">
+                    <td colspan="7" class="text-center py-4">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <p class="text-muted mt-2">Производственные заказы не найдены</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

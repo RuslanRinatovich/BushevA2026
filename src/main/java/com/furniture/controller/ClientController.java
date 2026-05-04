@@ -48,7 +48,11 @@ public class ClientController {
                        RedirectAttributes ra) {
         try {
             clientService.save(client);
-            ra.addFlashAttribute("success", "Клиент сохранён");
+            if (client.getId() == null) {
+                ra.addFlashAttribute("success", "Клиент успешно добавлен");
+            } else {
+                ra.addFlashAttribute("success", "Клиент успешно обновлён");
+            }
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
         }
@@ -61,8 +65,10 @@ public class ClientController {
         try {
             clientService.deleteById(id);
             ra.addFlashAttribute("success", "Клиент удалён");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             ra.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Ошибка при удалении клиента");
         }
         return "redirect:/clients";
     }

@@ -1,18 +1,15 @@
 package com.furniture.controller;
 
-import com.furniture.dto.OrderDto;
-import com.furniture.entity.FinishedProduct;
-import com.furniture.entity.ProductionOrder;
-import com.furniture.entity.User;
+import com.furniture.dto.ProductionOrderDto;
 import com.furniture.service.FinishedProductService;
 import com.furniture.service.ProductionService;
-import com.furniture.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
 
 @Controller
 @RequestMapping("/production")
@@ -21,36 +18,40 @@ public class ProductionOrderController {
 
     private final ProductionService productionService;
     private final FinishedProductService productService;
-    private final UserService userService;
 
     @GetMapping("/orders")
-    public String listOrders(Model model) {
-        model.addAttribute("orders", productionService.findAllOrders());
+    public String listOrders(@RequestParam(required = false) String search,
+                             @RequestParam(required = false) String status,
+                             Model model) {
+        List<com.furniture.entity.ProductionOrder> orders;
+
+        // Если есть поиск или фильтр
+        if ((search != null && !search.isBlank()) || (status != null && !status.isBlank())) {
+            orders = productionService.filterOrders(search, status);
+            model.addAttribute("search", search);
+            model.addAttribute("status", status);
+        } else {
+            orders = productionService.findAllOrders();
+        }
+
+        model.addAttribute("orders", orders);
         return "production/orders";
     }
 
     @GetMapping("/order/create")
     public String createOrderForm(Model model) {
-        model.addAttribute("order", new OrderDto());
+        model.addAttribute("orderDto", new ProductionOrderDto());
         model.addAttribute("products", productService.findAll());
         return "production/order-form";
     }
 
     @PostMapping("/order/save")
-    public String saveOrder(@ModelAttribute OrderDto dto,
+    public String saveOrder(@ModelAttribute ProductionOrderDto dto,
                             Authentication auth,
                             RedirectAttributes ra) {
         try {
-            User user = userService.findByUsername(auth.getName());
-            FinishedProduct product = productService.findById(dto.getProductId());
-
-            ProductionOrder order = new ProductionOrder();
-            order.setProduct(product);
-            order.setPlannedQuantity(dto.getPlannedQuantity());
-            order.setCreatedBy(user);
-
-            productionService.createOrder(order);
-            ra.addFlashAttribute("success", "Заказ создан");
+            productionService.createOrder(dto, auth.getName());
+            ra.addFlashAttribute("success", "Заказ на производство создан");
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
         }
@@ -72,7 +73,7 @@ public class ProductionOrderController {
     public String writeOffMaterials(@PathVariable Long id, RedirectAttributes ra) {
         try {
             productionService.writeOffMaterials(id);
-            ra.addFlashAttribute("success", "Материалы списаны");
+            ra.addFlashAttribute("success", "Материалы списаны со склада");
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
         }

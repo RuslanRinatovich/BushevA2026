@@ -2,8 +2,13 @@ package com.furniture.service;
 
 import com.furniture.entity.FinishedProduct;
 import com.furniture.entity.ProductCategory;
+import com.furniture.entity.ProductionOrder;
+import com.furniture.entity.Shipment;
 import com.furniture.repository.FinishedProductRepository;
+import com.furniture.repository.ProductionOrderRepository;
+import com.furniture.repository.ShipmentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +22,8 @@ import java.util.List;
 public class FinishedProductService {
 
     private final FinishedProductRepository productRepository;
+    private final ProductionOrderRepository productionOrderRepository;
+    private final ShipmentRepository shipmentRepository;
 
     public List<FinishedProduct> findAll() {
         return productRepository.findAll();
@@ -97,7 +104,27 @@ public class FinishedProductService {
 
     @Transactional
     public void deleteById(Long id) {
-        productRepository.deleteById(id);
+        FinishedProduct product = findById(id);
+
+        // Проверка наличия связанных производственных заказов
+        List<ProductionOrder> orders = productionOrderRepository.findByProduct(product);
+        if (orders != null && !orders.isEmpty()) {
+            throw new RuntimeException("Невозможно удалить продукцию '" + product.getName() +
+                    "', так как она используется в производственных заказах");
+        }
+
+        // Проверка наличия связанных отгрузок
+        List<Shipment> shipments = shipmentRepository.findByProduct(product);
+        if (shipments != null && !shipments.isEmpty()) {
+            throw new RuntimeException("Невозможно удалить продукцию '" + product.getName() +
+                    "', так как она участвует в отгрузках");
+        }
+
+        try {
+            productRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("Невозможно удалить продукцию, так как она связана с другими записями в системе");
+        }
     }
 
     @Transactional
@@ -105,7 +132,8 @@ public class FinishedProductService {
         FinishedProduct product = findById(id);
         BigDecimal newBalance = product.getCurrentBalance().add(quantity);
         if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("Недостаточно продукции на складе");
+            throw new RuntimeException("Недостаточно продукции на складе. Доступно: " +
+                    product.getCurrentBalance() + " " + product.getUnit());
         }
         product.setCurrentBalance(newBalance);
         productRepository.save(product);
