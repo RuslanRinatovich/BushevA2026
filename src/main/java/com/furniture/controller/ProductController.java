@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/products")
@@ -23,8 +25,20 @@ public class ProductController {
     private final ProductCategoryService categoryService;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("products", productService.findAll());
+    public String list(@RequestParam(required = false) String search,
+                       @RequestParam(required = false) Long categoryId,
+                       Model model) {
+        List<FinishedProduct> products;
+        if (categoryId != null && categoryId > 0) {
+            products = productService.filterByCategory(categoryId);
+            model.addAttribute("selectedCategoryId", categoryId);
+        } else {
+            products = productService.search(search);
+        }
+
+        model.addAttribute("products", products);
+        model.addAttribute("search", search);
+        model.addAttribute("categories", categoryService.findAll());
         return "products/list";
     }
 
@@ -52,15 +66,22 @@ public class ProductController {
                 product.setCategory(category);
             }
 
+            // Важно: не устанавливаем image из DTO
+            // product.setImage(...) - не делаем этого
+
             if (dto.getId() == null) {
+                // Новый продукт - передаём файл
                 productService.save(product, imageFile);
                 ra.addFlashAttribute("success", "Продукт добавлен");
             } else {
+                // Обновление - передаём файл и ID
                 productService.update(product, imageFile);
                 ra.addFlashAttribute("success", "Продукт обновлён");
             }
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
+            e.printStackTrace();
+            return dto.getId() == null ? "redirect:/products/create" : "redirect:/products/edit/" + dto.getId();
         }
         return "redirect:/products";
     }

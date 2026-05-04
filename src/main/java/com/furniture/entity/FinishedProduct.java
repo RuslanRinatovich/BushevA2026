@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+
 import java.math.BigDecimal;
+import java.sql.Types;
 import java.time.LocalDateTime;
 
 @Entity
@@ -41,7 +44,8 @@ public class FinishedProduct {
     private BigDecimal currentBalance = BigDecimal.ZERO;
 
     @Lob
-    @Column(columnDefinition = "BYTEA")
+    @JdbcTypeCode(Types.BINARY)
+    @Column(columnDefinition = "bytea")
     private byte[] image;
 
     @Column(name = "created_at")

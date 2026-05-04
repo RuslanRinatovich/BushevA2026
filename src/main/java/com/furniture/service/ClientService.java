@@ -22,6 +22,13 @@ public class ClientService {
                 .orElseThrow(() -> new RuntimeException("Клиент не найден"));
     }
 
+    public List<Client> search(String search) {
+        if (search == null || search.isBlank()) {
+            return clientRepository.findAll();
+        }
+        return clientRepository.findByNameContainingIgnoreCase(search);
+    }
+
     @Transactional
     public Client save(Client client) {
         return clientRepository.save(client);
@@ -30,12 +37,5 @@ public class ClientService {
     @Transactional
     public void deleteById(Long id) {
         clientRepository.deleteById(id);
-    }
-
-    public List<Client> searchByName(String name) {
-        if (name == null || name.isBlank()) {
-            return clientRepository.findAll();
-        }
-        return clientRepository.findByNameContainingIgnoreCase(name);
     }
 }
