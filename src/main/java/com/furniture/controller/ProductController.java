@@ -3,8 +3,10 @@ package com.furniture.controller;
 import com.furniture.dto.ProductDto;
 import com.furniture.entity.FinishedProduct;
 import com.furniture.entity.ProductCategory;
+import com.furniture.service.ExcelExportService;
 import com.furniture.service.FinishedProductService;
 import com.furniture.service.ProductCategoryService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,13 @@ public class ProductController {
 
     private final FinishedProductService productService;
     private final ProductCategoryService categoryService;
+    private final ExcelExportService excelExportService;
 
+    @GetMapping("/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        List<FinishedProduct> products = productService.findAll();
+        excelExportService.exportProductsToExcel(products, response);
+    }
     @GetMapping
     public String list(@RequestParam(required = false) String search,
                        @RequestParam(required = false) Long categoryId,

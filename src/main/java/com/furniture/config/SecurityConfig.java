@@ -30,27 +30,38 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Публичные страницы
                         .requestMatchers("/login", "/css/**", "/webjars/**", "/images/**").permitAll()
+
                         // Страницы доступные всем авторизованным
                         .requestMatchers("/dashboard").authenticated()
+                        .requestMatchers("/clients/**").authenticated()
+
                         // Только директор
                         .requestMatchers("/admin/**", "/users/**").hasRole("DIRECTOR")
+
                         // Материалы – директор и мастер
                         .requestMatchers("/materials/**").hasAnyRole("DIRECTOR", "MASTER")
+
                         // Продукция – директор и мастер
                         .requestMatchers("/products/**").hasAnyRole("DIRECTOR", "MASTER")
-                        // Производство – мастер
-                        .requestMatchers("/production/**").hasRole("MASTER")
-                        // Отгрузка – кладовщик
-                        .requestMatchers("/shipments/**").hasRole("STOREKEEPER")
-                        // Клиенты – все
-                        .requestMatchers("/clients/**").authenticated()
-                        // Отчёты – все авторизованные
-                        .requestMatchers("/reports/**").authenticated()
 
-                        .requestMatchers("/reports/balances").hasAnyRole("DIRECTOR", "MANAGER", "STOREKEEPER")
-                        .requestMatchers("/reports/production").hasRole("DIRECTOR")
+                        // Производство – директор и мастер (исправлено)
+                        .requestMatchers("/production/**").hasAnyRole("DIRECTOR", "MASTER")
+
+                        // Отгрузки – кладовщик
+                        .requestMatchers("/shipments/**").hasRole("STOREKEEPER")
+
+                        // Отчёты – по ролям
+                        .requestMatchers("/reports/balances").hasAnyRole("DIRECTOR", "MASTER", "STOREKEEPER")
+                        .requestMatchers("/reports/production").hasAnyRole("DIRECTOR", "MASTER")
                         .requestMatchers("/reports/revenue").hasRole("DIRECTOR")
-                        .requestMatchers("/reports/**").hasRole("DIRECTOR")
+
+                        // Экспорт в Excel – для соответствующих ролей
+                        .requestMatchers("/materials/export/excel").hasAnyRole("DIRECTOR", "MASTER")
+                        .requestMatchers("/products/export/excel").hasAnyRole("DIRECTOR", "MASTER")
+                        .requestMatchers("/clients/export/excel").hasAnyRole("DIRECTOR", "MASTER")
+                        .requestMatchers("/production/orders/export/excel").hasAnyRole("DIRECTOR", "MASTER")
+                        .requestMatchers("/shipments/export/excel").hasRole("STOREKEEPER")
+
                         // Остальное – только авторизованные
                         .anyRequest().authenticated()
                 )

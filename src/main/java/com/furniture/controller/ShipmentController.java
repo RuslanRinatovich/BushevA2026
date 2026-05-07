@@ -1,27 +1,38 @@
 package com.furniture.controller;
 
 import com.furniture.dto.ShipmentDto;
-import com.furniture.service.ClientService;
-import com.furniture.service.FinishedProductService;
-import com.furniture.service.ShipmentService;
-import com.furniture.service.UserService;
+import com.furniture.service.*;
 import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.List;
+
+import com.furniture.entity.Shipment;
 
 @Controller
 @RequestMapping("/shipments")
 @RequiredArgsConstructor
 public class ShipmentController {
-
+    private final ExcelExportService excelExportService;
     private final ShipmentService shipmentService;
     private final ClientService clientService;
     private final FinishedProductService productService;
     private final UserService userService;
+
+
+    @GetMapping("/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        List<Shipment> shipments = shipmentService.findAll();
+        excelExportService.exportShipmentsToExcel(shipments, response);
+    }
 
     @GetMapping
     public String list(@RequestParam(required = false) String search, Model model) {

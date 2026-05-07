@@ -1,12 +1,16 @@
 package com.furniture.controller;
 
 import com.furniture.entity.Material;
+import com.furniture.service.ExcelExportService;
 import com.furniture.service.MaterialService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +20,8 @@ import java.util.List;
 public class MaterialController {
 
     private final MaterialService materialService;
+    private final ExcelExportService excelExportService;
+
 
     // Список единиц измерения - вынесен в константу
     private static final List<String> UNIT_OPTIONS = Arrays.asList(
@@ -99,5 +105,11 @@ public class MaterialController {
             ra.addFlashAttribute("error", e.getMessage());
         }
         return "redirect:/materials";
+    }
+
+    @GetMapping("/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        List<Material> materials = materialService.findAll();
+        excelExportService.exportMaterialsToExcel(materials, response);
     }
 }

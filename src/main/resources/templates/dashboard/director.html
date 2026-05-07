@@ -5,11 +5,9 @@
     <title>FurnitureFactory | Директор</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
         .navbar-brand { font-weight: bold; font-size: 1.5rem; }
         .stat-card { border-radius: 15px; transition: transform 0.3s; cursor: pointer; }
         .stat-card:hover { transform: translateY(-5px); }
@@ -33,6 +31,8 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; font-weight: bold; color: white;
         }
+        .chart-container { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        canvas { max-height: 300px; }
     </style>
 </head>
 <body>
@@ -51,7 +51,7 @@
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="menu-card p-4" style="min-height: auto; background: white;">
+            <div class="menu-card p-4" style="min-height: auto;">
                 <div class="d-flex align-items-center gap-3">
                     <div class="welcome-avatar"><span th:text="${#strings.substring(fullName, 0, 1)}">А</span></div>
                     <div>
@@ -91,73 +91,114 @@
         </div>
     </div>
 
-    <!-- Menu Cards -->
-    <div class="row g-4">
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-boxes fs-1 text-primary"></i>
-                <h5 class="mt-2">Материалы</h5>
-                <p class="text-muted small">Учёт сырья</p>
-                <a href="/materials" class="btn btn-outline-primary btn-custom">Перейти →</a>
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-8">
+            <div class="chart-container">
+                <h5><i class="bi bi-graph-up"></i> Динамика выручки за последние 6 месяцев</h5>
+                <canvas id="revenueChart"></canvas>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-cup-straw fs-1 text-success"></i>
-                <h5 class="mt-2">Продукция</h5>
-                <p class="text-muted small">Готовая продукция</p>
-                <a href="/products" class="btn btn-outline-success btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-people fs-1 text-info"></i>
-                <h5 class="mt-2">Клиенты</h5>
-                <p class="text-muted small">База клиентов</p>
-                <a href="/clients" class="btn btn-outline-info btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-gear-wide-connected fs-1 text-secondary"></i>
-                <h5 class="mt-2">Производство</h5>
-                <p class="text-muted small">Управление заказами</p>
-                <a href="/production/orders" class="btn btn-outline-secondary btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-shield-lock fs-1 text-danger"></i>
-                <h5 class="mt-2">Пользователи</h5>
-                <p class="text-muted small">Управление доступом</p>
-                <a href="/admin/users" class="btn btn-outline-danger btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-file-text fs-1 text-warning"></i>
-                <h5 class="mt-2">Остатки</h5>
-                <p class="text-muted small">Материалы и продукция</p>
-                <a href="/reports/balances" class="btn btn-outline-warning btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-graph-up fs-1 text-info"></i>
-                <h5 class="mt-2">Производство</h5>
-                <p class="text-muted small">Статистика заказов</p>
-                <a href="/reports/production" class="btn btn-outline-info btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="menu-card text-center p-3">
-                <i class="bi bi-calculator fs-1 text-success"></i>
-                <h5 class="mt-2">Выручка</h5>
-                <p class="text-muted small">Финансовая статистика</p>
-                <a href="/reports/revenue" class="btn btn-outline-success btn-custom">Перейти →</a>
+        <div class="col-md-4">
+            <div class="chart-container">
+                <h5><i class="bi bi-pie-chart"></i> Статус заказов</h5>
+                <canvas id="productionChart"></canvas>
             </div>
         </div>
     </div>
+
+    <!-- Menu Cards -->
+    <div class="row g-4">
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-boxes fs-1 text-primary"></i><h5>Материалы</h5><p class="small">Учёт сырья</p><a href="/materials" class="btn btn-outline-primary btn-custom">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-cup-straw fs-1 text-success"></i><h5>Продукция</h5><p class="small">Готовая продукция</p><a href="/products" class="btn btn-outline-success btn-custom">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-people fs-1 text-info"></i><h5>Клиенты</h5><p class="small">База клиентов</p><a href="/clients" class="btn btn-outline-info btn-custom">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-gear-wide-connected fs-1 text-secondary"></i><h5>Производство</h5><p class="small">Управление заказами</p><a href="/production/orders" class="btn btn-outline-secondary btn-custom">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-shield-lock fs-1 text-danger"></i><h5>Пользователи</h5><p class="small">Управление доступом</p><a href="/admin/users" class="btn btn-outline-danger btn-custom">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-file-text fs-1 text-warning"></i><h5>Остатки</h5><p class="small">Материалы и продукция</p><a href="/reports/balances" class="btn btn-outline-warning btn-custom">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-graph-up fs-1 text-primary"></i><h5>Производство</h5><p class="small">Статистика заказов</p><a href="/reports/production" class="btn btn-outline-primary btn-custom">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="menu-card text-center p-3"><i class="bi bi-cash-stack fs-1 text-success"></i><h5>Выручка</h5><p class="small">Финансовая статистика</p><a href="/reports/revenue" class="btn btn-outline-success btn-custom">Перейти →</a></div></div>
+    </div>
 </div>
+
+<script th:inline="javascript">
+    // График выручки
+    var months = /*[[${chartMonths}]]*/ [];
+    var revenues = /*[[${chartRevenues}]]*/ [];
+
+    if (months.length > 0) {
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Выручка (₽)',
+                    data: revenues,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#667eea',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.toLocaleString() + ' ₽';
+                            }
+                        }
+                    },
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString() + ' ₽';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Статус заказов
+    var productionStats = /*[[${productionStats}]]*/ {};
+    var productionCtx = document.getElementById('productionChart').getContext('2d');
+    new Chart(productionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(productionStats),
+            datasets: [{
+                data: Object.values(productionStats),
+                backgroundColor: ['#6c757d', '#fd7e14', '#28a745', '#dc3545'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + ' шт.';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>

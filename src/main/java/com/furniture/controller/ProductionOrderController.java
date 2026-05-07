@@ -1,9 +1,13 @@
 package com.furniture.controller;
 
 import com.furniture.dto.ProductionOrderDto;
+import com.furniture.entity.ProductionOrder;
+import com.furniture.service.ExcelExportService;
 import com.furniture.service.FinishedProductService;
 import com.furniture.service.ProductionService;
 import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +22,13 @@ public class ProductionOrderController {
 
     private final ProductionService productionService;
     private final FinishedProductService productService;
+    private final ExcelExportService excelExportService;
 
+    @GetMapping("/orders/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        List<ProductionOrder> orders = productionService.findAllOrders();
+        excelExportService.exportProductionOrdersToExcel(orders, response);
+    }
     @GetMapping("/orders")
     public String listOrders(@RequestParam(required = false) String search,
                              @RequestParam(required = false) String status,

@@ -15,6 +15,7 @@ public class DashboardController {
     private final ProductionService productionService;
     private final ShipmentService shipmentService;
     private final MaterialService materialService;  // Добавить
+    private final ReportService reportService;
 
     @GetMapping("/dashboard")
     public String dashboard(Authentication auth, Model model) {
@@ -26,6 +27,13 @@ public class DashboardController {
         model.addAttribute("activeOrders", productionService.countActiveOrders());
         model.addAttribute("lowStockMaterials", materialService.countLowStock());
         model.addAttribute("monthlyRevenue", shipmentService.getMonthlyRevenue());
+
+        // Данные для графиков (только для директора)
+        if ("DIRECTOR".equals(user.getRole())) {
+            model.addAttribute("chartMonths", reportService.getLast6Months());
+            model.addAttribute("chartRevenues", reportService.getLast6MonthsRevenue());
+            model.addAttribute("productionStats", reportService.getProductionStats());
+        }
 
         String role = user.getRole();
         if ("DIRECTOR".equals(role)) {

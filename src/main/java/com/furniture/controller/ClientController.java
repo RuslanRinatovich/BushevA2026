@@ -2,7 +2,10 @@ package com.furniture.controller;
 
 import com.furniture.entity.Client;
 import com.furniture.service.ClientService;
+import com.furniture.service.ExcelExportService;
 import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +16,14 @@ import java.util.List;
 @RequestMapping("/clients")
 @RequiredArgsConstructor
 public class ClientController {
+    private final ExcelExportService excelExportService;
 
     private final ClientService clientService;
-
+    @GetMapping("/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        List<Client> clients = clientService.findAll();
+        excelExportService.exportClientsToExcel(clients, response);
+    }
     @GetMapping
     public String list(@RequestParam(required = false) String search,
                        Model model) {

@@ -111,4 +111,36 @@ public class ReportService {
         FinishedProduct product = productRepository.findById(productId).orElse(null);
         return product != null ? product.getCostPrice() : BigDecimal.ZERO;
     }
+
+    // Добавьте в ReportService
+
+    public List<String> getLast6Months() {
+        List<String> months = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        for (int i = 5; i >= 0; i--) {
+            months.add(now.minusMonths(i).format(DateTimeFormatter.ofPattern("MMM yyyy")));
+        }
+        return months;
+    }
+
+    public List<BigDecimal> getLast6MonthsRevenue() {
+        List<BigDecimal> revenues = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        for (int i = 5; i >= 0; i--) {
+            LocalDate startDate = now.minusMonths(i).withDayOfMonth(1);
+            LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+            BigDecimal revenue = shipmentRepository.getTotalRevenueForPeriod(startDate, endDate);
+            revenues.add(revenue != null ? revenue : BigDecimal.ZERO);
+        }
+        return revenues;
+    }
+
+    public Map<String, Long> getProductionStats() {
+        Map<String, Long> stats = new LinkedHashMap<>();
+        stats.put("Планируется", (long) orderRepository.findByStatus("planned").size());
+        stats.put("В работе", (long) orderRepository.findByStatus("in_progress").size());
+        stats.put("Завершены", (long) orderRepository.findByStatus("completed").size());
+        stats.put("Отменены", (long) orderRepository.findByStatus("cancelled").size());
+        return stats;
+    }
 }
