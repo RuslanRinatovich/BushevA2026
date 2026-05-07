@@ -22,7 +22,8 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     @Query("SELECT o FROM ProductionOrder o WHERE o.status IN ('planned', 'in_progress')")
     List<ProductionOrder> findActiveOrders();
-
+    // ProductionOrderRepository.java
+    long countByStatus(String status);
     Optional<ProductionOrder> findTopByOrderByIdDesc();
 
     // Поиск по номеру заказа или названию продукции

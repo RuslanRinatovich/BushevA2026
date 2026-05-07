@@ -1,10 +1,6 @@
 package com.furniture.controller;
 
 import com.furniture.dto.ShipmentDto;
-import com.furniture.entity.Client;
-import com.furniture.entity.FinishedProduct;
-import com.furniture.entity.Shipment;
-import com.furniture.entity.User;
 import com.furniture.service.ClientService;
 import com.furniture.service.FinishedProductService;
 import com.furniture.service.ShipmentService;
@@ -15,8 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.math.BigDecimal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/shipments")
@@ -29,39 +24,45 @@ public class ShipmentController {
     private final UserService userService;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("shipments", shipmentService.findAll());
+    public String list(@RequestParam(required = false) String search, Model model) {
+        List<com.furniture.entity.Shipment> shipments;
+        if (search != null && !search.isBlank()) {
+            shipments = shipmentService.searchShipments(search);
+            model.addAttribute("search", search);
+        } else {
+            shipments = shipmentService.findAll();
+        }
+        model.addAttribute("shipments", shipments);
         return "shipments/list";
     }
 
     @GetMapping("/create")
     public String createForm(Model model) {
-        model.addAttribute("shipment", new ShipmentDto());
+        model.addAttribute("shipmentDto", new ShipmentDto());
         model.addAttribute("clients", clientService.findAll());
         model.addAttribute("products", productService.findAll());
         return "shipments/form";
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute ShipmentDto dto,
+    public String save(@ModelAttribute ShipmentDto shipmentDto,
                        Authentication auth,
                        RedirectAttributes ra) {
         try {
-            User user = userService.findByUsername(auth.getName());
-            Client client = clientService.findById(dto.getClientId());
-            FinishedProduct product = productService.findById(dto.getProductId());
+            var user = userService.findByUsername(auth.getName());
+            shipmentService.createShipment(shipmentDto, user);
+            ra.addFlashAttribute("success", "Отгрузка оформлена успешно");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/shipments";
+    }
 
-            Shipment shipment = new Shipment();
-            shipment.setClient(client);
-            shipment.setProduct(product);
-            shipment.setQuantity(dto.getQuantity());
-            shipment.setPrice(dto.getPrice());
-            shipment.setTotalAmount(dto.getQuantity().multiply(dto.getPrice()));
-            shipment.setShipmentDate(dto.getShipmentDate());
-            shipment.setCreatedBy(user);
-
-            shipmentService.createShipment(shipment);
-            ra.addFlashAttribute("success", "Отгрузка оформлена");
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            shipmentService.deleteShipment(id);
+            ra.addFlashAttribute("success", "Отгрузка удалена");
         } catch (Exception e) {
             ra.addFlashAttribute("error", e.getMessage());
         }

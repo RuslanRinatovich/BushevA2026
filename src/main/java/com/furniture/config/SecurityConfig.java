@@ -46,6 +46,11 @@ public class SecurityConfig {
                         .requestMatchers("/clients/**").authenticated()
                         // Отчёты – все авторизованные
                         .requestMatchers("/reports/**").authenticated()
+
+                        .requestMatchers("/reports/balances").hasAnyRole("DIRECTOR", "MANAGER", "STOREKEEPER")
+                        .requestMatchers("/reports/production").hasRole("DIRECTOR")
+                        .requestMatchers("/reports/revenue").hasRole("DIRECTOR")
+                        .requestMatchers("/reports/**").hasRole("DIRECTOR")
                         // Остальное – только авторизованные
                         .anyRequest().authenticated()
                 )

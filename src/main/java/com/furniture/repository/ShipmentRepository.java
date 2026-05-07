@@ -9,15 +9,14 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
     List<Shipment> findByShipmentDateBetween(LocalDate startDate, LocalDate endDate);
     List<Shipment> findByClient(Client client);
     List<Shipment> findByProduct(FinishedProduct product);
     List<Shipment> findByOrderByShipmentDateDesc();
-
-    @Query("SELECT COALESCE(SUM(s.quantity), 0) FROM Shipment s WHERE s.product.id = :productId")
-    BigDecimal getTotalShippedQuantityByProductId(@Param("productId") Long productId);
+    Optional<Shipment> findTopByOrderByIdDesc();
 
     @Query("SELECT COALESCE(SUM(s.totalAmount), 0) FROM Shipment s WHERE s.shipmentDate BETWEEN :startDate AND :endDate")
     BigDecimal getTotalRevenueForPeriod(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);

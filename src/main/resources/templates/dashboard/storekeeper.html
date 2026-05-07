@@ -8,8 +8,18 @@
     <style>
         body { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); min-height: 100vh; }
         .navbar-brand { font-weight: bold; font-size: 1.5rem; }
-        .main-card { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: white; }
-        .btn-custom { border-radius: 10px; padding: 10px 16px; font-weight: 500; transition: all 0.3s; }
+        .menu-card {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: white;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+        .menu-card:hover { transform: translateY(-5px); }
+        .btn-custom { border-radius: 10px; padding: 10px 16px; font-weight: 500; transition: all 0.3s; width: 100%; }
         .btn-custom:hover { transform: translateY(-2px); }
         .welcome-avatar {
             width: 60px; height: 60px;
@@ -37,7 +47,7 @@
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="main-card p-4">
+            <div class="menu-card p-4" style="min-height: auto; background: white;">
                 <div class="d-flex align-items-center gap-3">
                     <div class="welcome-avatar"><span th:text="${#strings.substring(fullName, 0, 1)}">К</span></div>
                     <div>
@@ -51,7 +61,7 @@
 
     <!-- Menu Cards -->
     <div class="row g-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="stat-card bg-info text-white p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div><h4 class="mb-0">Отгрузки</h4><p class="text-white-50 mb-0">Оформление отгрузки готовой продукции</p></div>
@@ -60,13 +70,22 @@
                 <a href="/shipments" class="btn btn-light w-100">Перейти →</a>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="stat-card bg-warning p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div><h4 class="mb-0">Клиенты</h4><p class="mb-0">Просмотр базы клиентов</p></div>
                     <i class="bi bi-people fs-1"></i>
                 </div>
                 <a href="/clients" class="btn btn-light w-100">Перейти →</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-secondary text-white p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div><h4 class="mb-0">Остатки</h4><p class="text-white-50 mb-0">Просмотр остатков материалов и продукции</p></div>
+                    <i class="bi bi-file-text fs-1"></i>
+                </div>
+                <a href="/reports/balances" class="btn btn-light w-100">Перейти →</a>
             </div>
         </div>
     </div>
