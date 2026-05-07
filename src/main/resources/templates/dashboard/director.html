@@ -10,55 +10,27 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        .stat-card {
-            border-radius: 15px;
-            transition: transform 0.3s;
-            cursor: pointer;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .stat-icon {
-            font-size: 2.5rem;
-            opacity: 0.7;
-        }
-        .main-card {
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .btn-custom {
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        .btn-custom:hover {
-            transform: translateY(-2px);
-        }
+        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
+        .stat-card { border-radius: 15px; transition: transform 0.3s; cursor: pointer; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-icon { font-size: 2.5rem; opacity: 0.7; }
+        .main-card { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: white; }
+        .btn-custom { border-radius: 10px; padding: 10px 16px; font-weight: 500; transition: all 0.3s; }
+        .btn-custom:hover { transform: translateY(-2px); }
         .welcome-avatar {
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: bold; color: white;
         }
+        .role-badge { background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-dark bg-dark shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/dashboard">
-            <i class="bi bi-building"></i> FurnitureFactory
-        </a>
+        <a class="navbar-brand" href="/dashboard"><i class="bi bi-building"></i> FurnitureFactory</a>
         <div class="d-flex gap-3">
             <span class="text-light"><i class="bi bi-person-circle"></i> <span th:text="${fullName}"></span></span>
             <a href="/logout" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Выйти</a>
@@ -70,11 +42,9 @@
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="main-card bg-white p-4">
+            <div class="main-card p-4">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="welcome-avatar text-white">
-                        <span th:text="${#strings.substring(fullName, 0, 1)}">А</span>
-                    </div>
+                    <div class="welcome-avatar"><span th:text="${#strings.substring(fullName, 0, 1)}">А</span></div>
                     <div>
                         <h2 class="mb-0">Добрый день, <span th:text="${fullName}"></span>!</h2>
                         <p class="text-muted mb-0"><i class="bi bi-shield-check"></i> Директор · Полный доступ к системе</p>
@@ -87,42 +57,26 @@
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="card stat-card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-white-50">Активные заказы</h6>
-                            <h2 class="mb-0" th:text="${activeOrders}">0</h2>
-                        </div>
-                        <i class="bi bi-gear stat-icon"></i>
-                    </div>
+            <div class="stat-card bg-primary text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-white-50">Активные заказы</h6><h2 class="mb-0" th:text="${activeOrders}">0</h2></div>
+                    <i class="bi bi-gear stat-icon"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card stat-card bg-warning text-dark">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-dark-50">Материалы ниже нормы</h6>
-                            <h2 class="mb-0" th:text="${lowStockMaterials}">0</h2>
-                        </div>
-                        <i class="bi bi-exclamation-triangle stat-icon"></i>
-                    </div>
+            <div class="stat-card bg-warning text-dark p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-dark-50">Материалы ниже нормы</h6><h2 class="mb-0" th:text="${lowStockMaterials}">0</h2></div>
+                    <i class="bi bi-exclamation-triangle stat-icon"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card stat-card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-white-50">Выручка за месяц</h6>
-                            <h2 class="mb-0" th:text="${#numbers.formatDecimal(monthlyRevenue, 1, 2)}">0</h2>
-                            <small>₽</small>
-                        </div>
-                        <i class="bi bi-currency-ruble stat-icon"></i>
-                    </div>
+            <div class="stat-card bg-success text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-white-50">Выручка за месяц</h6><h2 class="mb-0" th:text="${#numbers.formatDecimal(monthlyRevenue, 1, 2)}">0</h2><small>₽</small></div>
+                    <i class="bi bi-currency-ruble stat-icon"></i>
                 </div>
             </div>
         </div>
@@ -130,48 +84,13 @@
 
     <!-- Menu Cards -->
     <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card main-card text-center p-3">
-                <i class="bi bi-boxes fs-1 text-primary"></i>
-                <h5 class="mt-2">Материалы</h5>
-                <p class="text-muted small">Учёт сырья и материалов</p>
-                <a href="/materials" class="btn btn-outline-primary btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card main-card text-center p-3">
-                <i class="bi bi-cup-straw fs-1 text-success"></i>
-                <h5 class="mt-2">Продукция</h5>
-                <p class="text-muted small">Готовая продукция</p>
-                <a href="/products" class="btn btn-outline-success btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card main-card text-center p-3">
-                <i class="bi bi-people fs-1 text-info"></i>
-                <h5 class="mt-2">Клиенты</h5>
-                <p class="text-muted small">База клиентов</p>
-                <a href="/clients" class="btn btn-outline-info btn-custom">Перейти →</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card main-card text-center p-3">
-                <i class="bi bi-file-text fs-1 text-warning"></i>
-                <h5 class="mt-2">Отчёты</h5>
-                <p class="text-muted small">Аналитика и статистика</p>
-                <a href="/reports" class="btn btn-outline-warning btn-custom">Перейти →</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card main-card text-center p-3">
-            <i class="bi bi-shield-lock fs-1 text-danger"></i>
-            <h5 class="mt-2">Пользователи</h5>
-            <p class="text-muted small">Управление учётными записями</p>
-            <a href="/admin/users" class="btn btn-outline-danger btn-custom">Перейти →</a>
-        </div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-boxes fs-1 text-primary"></i><h5 class="mt-2">Материалы</h5><p class="text-muted small">Учёт сырья</p><a href="/materials" class="btn btn-outline-primary btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-cup-straw fs-1 text-success"></i><h5 class="mt-2">Продукция</h5><p class="text-muted small">Готовая продукция</p><a href="/products" class="btn btn-outline-success btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-people fs-1 text-info"></i><h5 class="mt-2">Клиенты</h5><p class="text-muted small">База клиентов</p><a href="/clients" class="btn btn-outline-info btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-file-text fs-1 text-warning"></i><h5 class="mt-2">Отчёты</h5><p class="text-muted small">Аналитика</p><a href="/reports" class="btn btn-outline-warning btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-shield-lock fs-1 text-danger"></i><h5 class="mt-2">Пользователи</h5><p class="text-muted small">Управление</p><a href="/admin/users" class="btn btn-outline-danger btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-gear-wide-connected fs-1 text-secondary"></i><h5 class="mt-2">Производство</h5><p class="text-muted small">Заказы</p><a href="/production/orders" class="btn btn-outline-secondary btn-custom w-100">Перейти →</a></div></div>
     </div>
 </div>
-
 </body>
 </html>

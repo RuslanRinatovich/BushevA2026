@@ -6,32 +6,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        body {
+        body { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); min-height: 100vh; }
+        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
+        .stat-card { border-radius: 15px; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .main-card { border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: white; }
+        .btn-custom { border-radius: 10px; padding: 10px 16px; font-weight: 500; transition: all 0.3s; }
+        .btn-custom:hover { transform: translateY(-2px); }
+        .welcome-avatar {
+            width: 60px; height: 60px;
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            min-height: 100vh;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        .stat-card {
-            border-radius: 15px;
-            transition: transform 0.3s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .main-card {
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .btn-custom {
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 500;
-        }
-        .production-badge {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: bold; color: white;
         }
     </style>
 </head>
@@ -39,9 +25,7 @@
 
 <nav class="navbar navbar-dark bg-dark shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/dashboard">
-            <i class="bi bi-bricks"></i> FurnitureFactory
-        </a>
+        <a class="navbar-brand" href="/dashboard"><i class="bi bi-bricks"></i> FurnitureFactory</a>
         <div class="d-flex gap-3">
             <span class="text-light"><i class="bi bi-person-circle"></i> <span th:text="${fullName}"></span></span>
             <a href="/logout" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Выйти</a>
@@ -53,77 +37,45 @@
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="main-card bg-white p-4">
-                <h2><i class="bi bi-tools"></i> Здравствуйте, <span th:text="${fullName}"></span>!</h2>
-                <p class="text-muted mb-0"><i class="bi bi-gear-fill"></i> Мастер цеха · Управление производством</p>
+            <div class="main-card p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="welcome-avatar"><span th:text="${#strings.substring(fullName, 0, 1)}">М</span></div>
+                    <div>
+                        <h2 class="mb-0">Здравствуйте, <span th:text="${fullName}"></span>!</h2>
+                        <p class="text-muted mb-0"><i class="bi bi-gear-fill"></i> Мастер цеха · Управление производством</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats -->
+    <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-6">
-            <div class="card stat-card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6>Активные заказы</h6>
-                            <h2 class="mb-0" th:text="${activeOrders}">0</h2>
-                        </div>
-                        <i class="bi bi-list-check fs-1"></i>
-                    </div>
+            <div class="stat-card bg-info text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-white-50">Активные заказы</h6><h2 class="mb-0" th:text="${activeOrders}">0</h2></div>
+                    <i class="bi bi-list-check fs-1"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card stat-card bg-danger text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6>Материалы ниже нормы</h6>
-                            <h2 class="mb-0" th:text="${lowStockMaterials}">0</h2>
-                        </div>
-                        <i class="bi bi-exclamation-diamond fs-1"></i>
-                    </div>
+            <div class="stat-card bg-danger text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div><h6 class="text-white-50">Материалы ниже нормы</h6><h2 class="mb-0" th:text="${lowStockMaterials}">0</h2></div>
+                    <i class="bi bi-exclamation-diamond fs-1"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Actions -->
+    <!-- Menu Cards -->
     <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card main-card text-center p-3 border-0 shadow-sm">
-                <i class="bi bi-cubes fs-1 text-primary"></i>
-                <h5 class="mt-2">Материалы</h5>
-                <a href="/materials" class="btn btn-primary mt-2">Просмотр</a>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card main-card text-center p-3 border-0 shadow-sm">
-                <i class="bi bi-cup-straw fs-1 text-success"></i>
-                <h5 class="mt-2">Продукция</h5>
-                <a href="/products" class="btn btn-success mt-2">Просмотр</a>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card main-card text-center p-3 production-badge text-white">
-                <i class="bi bi-gear-wide-connected fs-1"></i>
-                <h5 class="mt-2">Производство</h5>
-                <a href="/production/orders" class="btn btn-light mt-2">Управление</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card main-card text-center p-3">
-                <i class="bi bi-people fs-1 text-info"></i>
-                <h5 class="mt-2">Клиенты</h5>
-                <p class="text-muted small">Управление клиентской базой</p>
-                <a href="/clients" class="btn btn-outline-info btn-custom">Перейти →</a>
-            </div>
-        </div>
-
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-boxes fs-1 text-primary"></i><h5 class="mt-2">Материалы</h5><p class="text-muted small">Просмотр сырья</p><a href="/materials" class="btn btn-outline-primary btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-cup-straw fs-1 text-success"></i><h5 class="mt-2">Продукция</h5><p class="text-muted small">Просмотр</p><a href="/products" class="btn btn-outline-success btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-people fs-1 text-info"></i><h5 class="mt-2">Клиенты</h5><p class="text-muted small">База клиентов</p><a href="/clients" class="btn btn-outline-info btn-custom w-100">Перейти →</a></div></div>
+        <div class="col-md-3"><div class="main-card text-center p-3"><i class="bi bi-gear-wide-connected fs-1 text-warning"></i><h5 class="mt-2">Производство</h5><p class="text-muted small">Управление заказами</p><a href="/production/orders" class="btn btn-outline-warning btn-custom w-100">Перейти →</a></div></div>
     </div>
 </div>
-
 </body>
 </html>
