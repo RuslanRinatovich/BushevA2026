@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ошибка | FurnitureFactory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .error-card {
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 20px;
+        }
+        .error-icon {
+            font-size: 5rem;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="error-card p-5 text-center">
+        <i class="bi bi-exclamation-triangle error-icon"></i>
+        <h1 class="mt-3">Упс! Что-то пошло не так</h1>
+        <p class="text-muted mt-3" th:text="${errorMessage} ?: 'Произошла непредвиденная ошибка'">Произошла непредвиденная ошибка</p>
+        <p class="small text-muted" th:if="${requestUrl}">URL: <span th:text="${requestUrl}"></span></p>
+        <p class="small text-muted" th:if="${timestamp}">Время: <span th:text="${timestamp}"></span></p>
+        <hr>
+        <a href="/dashboard" class="btn btn-primary btn-custom">
+            <i class="bi bi-house-door"></i> На главную
+        </a>
+        <button onclick="history.back()" class="btn btn-secondary btn-custom ms-2">
+            <i class="bi bi-arrow-left"></i> Назад
+        </button>
+    </div>
+</div>
+</body>
+</html>
